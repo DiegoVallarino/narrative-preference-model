@@ -102,5 +102,61 @@ plot_path = os.path.join(output_dir, "latent_preferences_plot.png")
 plt.savefig(plot_path, dpi=300)
 plt.close()
 
-print(f"✅ Plot saved to: {plot_path}")
-print(f"✅ Pairwise comparisons saved to: {os.path.join(output_dir, 'pairwise_comparisons.csv')}")
+
+#################################
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ---------------------------
+# Step 1: Define narrative features
+# ---------------------------
+narrative_dimensions = ['Non-Linearity', 'Early Intro', 'Intrigue', 'Surprise', 'Logic']
+
+series_data = {
+    'Slow Horses':     [0.75, 0.95, 0.90, 0.80, 0.70],
+    'Unforgotten':     [0.60, 0.90, 0.85, 0.60, 0.85],
+    'Mobland':         [0.80, 0.65, 0.75, 0.75, 0.50],
+    'Dept Q':          [0.65, 0.90, 0.88, 0.70, 0.75],
+    'Adolescence':     [0.50, 0.70, 0.95, 0.85, 0.90],
+}
+
+X = pd.DataFrame(series_data, index=narrative_dimensions).T
+
+# ---------------------------
+# Step 2: Simulate user preferences (latent vector w)
+# ---------------------------
+# Example user: likes intrigue and logic, dislikes excessive surprise or non-linearity
+w = np.array([0.3, 0.7, 1.2, 0.4, 1.0])  # weights for [N, E, I, S, L]
+
+# Normalize w (optional but helps interpretation)
+w = w / np.linalg.norm(w)
+
+# ---------------------------
+# Step 3: Compute utilities and softmax probabilities
+# ---------------------------
+utilities = X.values @ w  # U_i = w^T x_i
+exp_utilities = np.exp(utilities - np.max(utilities))  # for numerical stability
+probs = exp_utilities / exp_utilities.sum()
+
+# Create output DataFrame
+output_df = pd.DataFrame({
+    'Utility': utilities,
+    'Probability': probs
+}, index=X.index).sort_values(by='Probability', ascending=False)
+
+print("=== Narrative Preference Model: Ranking ===")
+print(output_df)
+
+# ---------------------------
+# Step 4: Visualize as bar plot
+# ---------------------------
+plt.figure(figsize=(10, 6))
+plt.barh(output_df.index[::-1], output_df['Probability'][::-1], color='navy')
+plt.xlabel("Selection Probability")
+plt.title("Narrative Recommendation Based on Latent Preferences")
+plt.grid(axis='x', linestyle='--', alpha=0.4)
+plt.tight_layout()
+plt.show()
+
+
