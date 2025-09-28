@@ -159,4 +159,45 @@ plt.grid(axis='x', linestyle='--', alpha=0.4)
 plt.tight_layout()
 plt.show()
 
+##########################################
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Series and narrative metrics
+series = ['Slow Horses', 'Unforgotten', 'Mobland', 'Dept Q', 'Adolescence']
+labels = ['Non-linearity (N)', 'Early Intro (E)', 'Intrigue (I)', 'Surprise (S)', 'Logic (L)']
+
+# Narrative scores based on analysis of reviews
+scores = {
+    'Slow Horses':     [0.75, 0.95, 0.90, 0.80, 0.70],  # Complex, cynical, layered
+    'Unforgotten':     [0.60, 0.90, 0.85, 0.60, 0.85],  # Procedural, emotionally deep
+    'Mobland':         [0.40, 0.80, 0.65, 0.75, 0.55],  # Crime drama, more stylized than tight
+    'Dept Q':          [0.65, 0.90, 0.88, 0.70, 0.75],  # Nordic noir, solid plot layering
+    'Adolescence':     [0.50, 0.70, 0.95, 0.85, 0.90]   # Indie-style, introspective, logical arcs
+}
+
+# Radar setup
+num_vars = len(labels)
+angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
+angles += angles[:1]  # Loop closure
+
+fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+plt.title("Narrative Signature of Five Shows and Films", size=16, pad=20)
+
+# Plot each series
+for show, values in scores.items():
+    values += values[:1]  # Loop closure
+    ax.plot(angles, values, label=show, linewidth=2)
+    ax.fill(angles, values, alpha=0.1)
+
+# Axis styling
+ax.set_theta_offset(np.pi / 2)
+ax.set_theta_direction(-1)
+ax.set_thetagrids(np.degrees(angles[:-1]), labels)
+ax.set_ylim(0, 1)
+ax.grid(True)
+ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1), fontsize=9)
+
+plt.show()
+
 
