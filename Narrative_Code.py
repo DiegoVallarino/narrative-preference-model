@@ -22,6 +22,43 @@ torch.manual_seed(42)
 output_dir = os.path.expanduser("~/Desktop/story_outputs")
 os.makedirs(output_dir, exist_ok=True)
 
+
+# ----------------------------------------------------------
+# Step 0: (Optional) Extract narrative features from text
+# ----------------------------------------------------------
+
+# Simulate synopses for each show (in practice, scraped from IMDb, Netflix, etc.)
+synopses = {
+    'Slow Horses': "A team of British intelligence agents... betrayals, secrets, and high-stakes missions.",
+    'Unforgotten': "Detectives solve cold cases... long-buried truths emerge.",
+    'Mobland': "A small-town man is drawn into a web of organized crime and violence.",
+    'Dept Q': "A detective and his partner solve dark, unresolved cases in Denmark.",
+    'Adolescence': "A troubled teenager navigates trauma, identity, and emotional chaos."
+}
+
+from sentence_transformers import SentenceTransformer
+from sklearn.preprocessing import MinMaxScaler
+
+# Load pre-trained semantic model (simulate text embeddings)
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Encode all synopses
+embeddings = model.encode(list(synopses.values()))
+
+# For illustrative purposes, simulate narrative scores via PCA (or fixed projections)
+from sklearn.decomposition import PCA
+pca = PCA(n_components=5)
+narrative_scores = pca.fit_transform(embeddings)
+
+# Normalize to [0,1]
+scaler = MinMaxScaler()
+scores_scaled = scaler.fit_transform(narrative_scores)
+
+# Rebuild feature DataFrame
+X = pd.DataFrame(scores_scaled, 
+                 columns=['Non-Linearity', 'Early Intro', 'Intrigue', 'Surprise', 'Logic'],
+                 index=synopses.keys())
+
 # --------------------------------------------------------
 # 1. Simulate Series Data
 # --------------------------------------------------------
@@ -199,5 +236,6 @@ ax.grid(True)
 ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1), fontsize=9)
 
 plt.show()
+
 
 
